@@ -11,10 +11,10 @@ provider "aws" {
 terraform {
 
   cloud {
-    organization = "FlemingFriday"
+    organization = "Class6_Terraform_Account"
 
     workspaces {
-      name = "learn-terraform-github-actions"
+      name = "gh-actions-workspace1"
     }
   }
 
@@ -27,16 +27,21 @@ terraform {
   }
 }
 
+#################################################
+# VPC
 resource "aws_vpc" "app1" {
-  cidr_block = "10.32.0.0/16"
+  cidr_block = "10.50.0.0/16"
 
   tags = {
     Name    = "app1"
     Service = "application1"
-    Owner   = "Chewbacca"
-    Planet  = "Mustafar"
+    Owner   = "Cobb"
+    Mission  = "Inception"
   }
 }
+
+#################################################
+# Security Group
 
 resource "aws_security_group" "app1-sg01-servers" {
   name        = "app1-sg01-servers"
@@ -60,7 +65,7 @@ resource "aws_security_group" "app1-sg01-servers" {
   }
 
   ingress {
-    description = "MyEvilBox"
+    description = "DirtyWindows"
     from_port   = 3389
     to_port     = 3389
     protocol    = "tcp"
@@ -78,99 +83,105 @@ resource "aws_security_group" "app1-sg01-servers" {
   tags = {
     Name    = "app1-sg01-servers"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Cobb"
+    Mission  = "Inception"
   }
 
 }
 
-
+#################################################
+# Public Subnets
 #These are   for  public
 
 resource "aws_subnet" "public-eu-west-1a" {
   vpc_id                  = aws_vpc.app1.id
-  cidr_block              = "10.32.1.0/24"
+  cidr_block              = "10.50.1.0/24"
   availability_zone       = "eu-west-1a"
   map_public_ip_on_launch = true
 
   tags = {
     Name    = "public-eu-west-1a"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Cobb"
+    Mission  = "Inception"
   }
 }
 
 resource "aws_subnet" "public-eu-west-1b" {
   vpc_id                  = aws_vpc.app1.id
-  cidr_block              = "10.32.2.0/24"
+  cidr_block              = "10.50.2.0/24"
   availability_zone       = "eu-west-1b"
   map_public_ip_on_launch = true
 
   tags = {
     Name    = "public-eu-west-1b"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Cobb"
+    Mission  = "Inception"
   }
 }
 
 
 resource "aws_subnet" "public-eu-west-1c" {
   vpc_id                  = aws_vpc.app1.id
-  cidr_block              = "10.32.3.0/24"
+  cidr_block              = "10.50.3.0/24"
   availability_zone       = "eu-west-1c"
   map_public_ip_on_launch = true
 
   tags = {
     Name    = "public-eu-west-1c"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Cobb"
+    Mission  = "Inception"
   }
 }
 
+#################################################
+# Private Subnets
 #these are for private
 resource "aws_subnet" "private-eu-west-1a" {
   vpc_id            = aws_vpc.app1.id
-  cidr_block        = "10.32.11.0/24"
+  cidr_block        = "10.50.11.0/24"
   availability_zone = "eu-west-1a"
 
   tags = {
     Name    = "private-eu-west-1a"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Maul"
+    Mission = "To Wake Up"
   }
 }
 
 resource "aws_subnet" "private-eu-west-1b" {
   vpc_id            = aws_vpc.app1.id
-  cidr_block        = "10.32.12.0/24"
+  cidr_block        = "10.50.12.0/24"
   availability_zone = "eu-west-1b"
 
   tags = {
     Name    = "private-eu-west-1b"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Maul"
+    Mission = "To Wake Up"
   }
 }
 
 
 resource "aws_subnet" "private-eu-west-1c" {
   vpc_id            = aws_vpc.app1.id
-  cidr_block        = "10.32.13.0/24"
+  cidr_block        = "10.50.13.0/24"
   availability_zone = "eu-west-1c"
 
   tags = {
     Name    = "private-eu-west-1c"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Maul"
+    Mission = "To Wake Up"
   }
 }
 
+
+#################################################
+# Internet Gateway
 resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.app1.id
 
@@ -191,6 +202,8 @@ resource "aws_eip" "nat" {
   }
 }
 
+#################################################
+# NAT Gateway
 resource "aws_nat_gateway" "nat" {
   allocation_id = aws_eip.nat.id
   subnet_id     = aws_subnet.public-eu-west-1a.id
@@ -202,6 +215,8 @@ resource "aws_nat_gateway" "nat" {
   depends_on = [aws_internet_gateway.igw]
 }
 
+#################################################
+# Route Tables
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.app1.id
 
@@ -254,6 +269,9 @@ resource "aws_route_table" "public" {
   }
 }
 
+#################################################
+# Route Table Associations
+#private
 resource "aws_route_table_association" "private-eu-west-1a" {
   subnet_id      = aws_subnet.private-eu-west-1a.id
   route_table_id = aws_route_table.private.id
@@ -270,7 +288,6 @@ resource "aws_route_table_association" "private-eu-west-1c" {
 
 
 #public
-
 resource "aws_route_table_association" "public-eu-west-1a" {
   subnet_id      = aws_subnet.public-eu-west-1a.id
   route_table_id = aws_route_table.public.id
@@ -291,7 +308,8 @@ resource "aws_route_table_association" "public-eu-west-1c" {
 
 
 
-
+#################################################
+# Launch Template
 
 resource "aws_launch_template" "app1_LT" {
   name_prefix   = "app1_LT"
@@ -353,8 +371,8 @@ resource "aws_launch_template" "app1_LT" {
     tags = {
       Name    = "app1_LT"
       Service = "application1"
-      Owner   = "Chewbacca"
-      Planet  = "Mustafar"
+      Owner   = "Cobb"
+      Mission = "Inception"
     }
   }
 

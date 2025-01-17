@@ -36,13 +36,12 @@ resource "aws_vpc" "app1" {
     Name    = "app1"
     Service = "application1"
     Owner   = "Cobb"
-    Mission  = "Inception"
+    Mission = "Inception"
   }
 }
 
 #################################################
 # Security Group
-
 resource "aws_security_group" "app1-sg01-servers" {
   name        = "app1-sg01-servers"
   description = "app1-sg01-servers"
@@ -84,7 +83,7 @@ resource "aws_security_group" "app1-sg01-servers" {
     Name    = "app1-sg01-servers"
     Service = "application1"
     Owner   = "Cobb"
-    Mission  = "Inception"
+    Mission = "Inception"
   }
 
 }
@@ -92,7 +91,6 @@ resource "aws_security_group" "app1-sg01-servers" {
 #################################################
 # Public Subnets
 #These are   for  public
-
 resource "aws_subnet" "public-eu-west-1a" {
   vpc_id                  = aws_vpc.app1.id
   cidr_block              = "10.50.1.0/24"
@@ -103,7 +101,7 @@ resource "aws_subnet" "public-eu-west-1a" {
     Name    = "public-eu-west-1a"
     Service = "application1"
     Owner   = "Cobb"
-    Mission  = "Inception"
+    Mission = "Inception"
   }
 }
 
@@ -117,10 +115,9 @@ resource "aws_subnet" "public-eu-west-1b" {
     Name    = "public-eu-west-1b"
     Service = "application1"
     Owner   = "Cobb"
-    Mission  = "Inception"
+    Mission = "Inception"
   }
 }
-
 
 resource "aws_subnet" "public-eu-west-1c" {
   vpc_id                  = aws_vpc.app1.id
@@ -132,7 +129,7 @@ resource "aws_subnet" "public-eu-west-1c" {
     Name    = "public-eu-west-1c"
     Service = "application1"
     Owner   = "Cobb"
-    Mission  = "Inception"
+    Mission = "Inception"
   }
 }
 
@@ -165,7 +162,6 @@ resource "aws_subnet" "private-eu-west-1b" {
   }
 }
 
-
 resource "aws_subnet" "private-eu-west-1c" {
   vpc_id            = aws_vpc.app1.id
   cidr_block        = "10.50.13.0/24"
@@ -179,7 +175,6 @@ resource "aws_subnet" "private-eu-west-1c" {
   }
 }
 
-
 #################################################
 # Internet Gateway
 resource "aws_internet_gateway" "igw" {
@@ -188,11 +183,10 @@ resource "aws_internet_gateway" "igw" {
   tags = {
     Name    = "app1_IG"
     Service = "application1"
-    Owner   = "Luke"
-    Planet  = "Musafar"
+    Owner   = "Cobb"
+    Mission = "Inception"
   }
 }
-
 
 resource "aws_eip" "nat" {
   vpc = true
@@ -302,11 +296,6 @@ resource "aws_route_table_association" "public-eu-west-1c" {
   subnet_id      = aws_subnet.public-eu-west-1c.id
   route_table_id = aws_route_table.public.id
 }
-
-
-
-
-
 
 #################################################
 # Launch Template
